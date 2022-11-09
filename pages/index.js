@@ -58,6 +58,8 @@ const StyledHeader = styled.div`
 `;
 const StyledBanner = styled.div`
     background-image: url(${({ bg }) => bg});
+    background-size: cover;
+    background-position: center center;
     /* background-image: url(${config.bg}); */
     height: 230px;
 `;
