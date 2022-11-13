@@ -1,11 +1,33 @@
+
 import React from "react";
 import config from "../config.json";
 import styled from "styled-components";
 import Menu from "../src/components/Menu";
 import { StyledTimeline } from "../src/components/Timeline";
+import { videoService } from "../src/services/videoService";
 
 function HomePage() {
+    const service = videoService();
     const [valorDoFiltro, setValorDoFiltro] = React.useState("");
+    const [playlists, setPlaylists] = React.useState({});     // config.playlists
+
+    React.useEffect(() => {
+        service
+            .getAllVideos()
+            .then((dados) => {
+                console.log(dados.data);
+                // Forma imutavel
+                const novasPlaylists = { ...playlists };
+                dados.data.forEach((video) => {
+                    if (!novasPlaylists[video.playlist]){
+                        novasPlaylists[video.playlist] = [];
+                    }
+                    novasPlaylists[video.playlist].push(video);
+                });
+
+                setPlaylists(novasPlaylists);
+            });
+    }, []);
 
     return (
         <>
@@ -18,7 +40,7 @@ function HomePage() {
                 {/* Prop Drilling */}
                 <Menu valorDoFiltro={valorDoFiltro} setValorDoFiltro={setValorDoFiltro} />
                 <Header />
-                <Timeline searchValue={valorDoFiltro} playlists={config.playlists}>
+                <Timeline searchValue={valorDoFiltro} playlists={playlists}>
                     Conteúdo
                 </Timeline>
             </div>
@@ -39,8 +61,7 @@ export default HomePage
 
 const StyledHeader = styled.div`
     background-color: ${({ theme }) => theme.backgroundLevel1};
-
-img {
+    img {
         width: 80px;
         height: 80px;
         border-radius: 50%;
@@ -54,9 +75,8 @@ img {
     }
 `;
 const StyledBanner = styled.div`
+    background-color: blue;
     background-image: url(${({ bg }) => bg});
-    background-size: cover;
-    background-position: center center;
     /* background-image: url(${config.bg}); */
     height: 230px;
 `;
